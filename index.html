@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мои соцсети</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 15px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 4px solid white;
+      object-fit: cover;
+      margin-bottom: 10px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-top: 10px;
+      color: #ffffff;
+    }
+
+    p {
+      margin-bottom: 25px;
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    .link-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 260px;
+      margin: 10px auto;
+      padding: 14px 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Instagram */
+    .link-button.instagram {
+      background: linear-gradient(45deg, #ff416c, #ff4b2b, #ff6a00);
+    }
+
+    /* TikTok */
+    .link-button.tiktok {
+      background: linear-gradient(45deg, #010101, #00f2ea, #ff004c);
+    }
+
+    /* YouTube */
+    .link-button.youtube {
+      background: linear-gradient(45deg, #ff0000, #ffffff);
+    }
+
+    /* Discord */
+    .link-button.discord {
+      background: linear-gradient(45deg, #7289da, #ffffff);
+    }
+
+    .link-button:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+
+    .link-button i {
+      font-size: 18px;
+    }
+
+    .copy-btn {
+      margin-top: 20px;
+      background: linear-gradient(45deg, #00c9ff, #92fe9d);
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .copy-btn:hover {
+      transform: scale(1.05);
+    }
+
+    @media screen and (max-width: 500px) {
+      .link-button {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Фон с анимацией -->
+  <div id="particles-js"></div>
+
+  <!-- Контент -->
+  <div class="content">
+    <!-- Вставьте путь к своей фотографии -->
+    <img src="kokushibo.png" class="avatar">
+    <!-- Имя под фотографией -->
+    <h2>Nuri</h2>
+    <h1>hello! 👋</h1>
+    <p>here is my social medias </p>
+
+    <a class="link-button instagram" href="https://instagram.com/nxr1_ba" target="_blank">
+      <i class="fab fa-instagram"></i> Instagram
+    </a>
+    <a class="link-button tiktok" href="https://tiktok.com/@nxr1_ba" target="_blank">
+      <i class="fab fa-tiktok"></i> TikTok
+    </a>
+    <a class="link-button youtube" href="https://youtube.com/@Nuriiscool" target="_blank">
+      <i class="fab fa-youtube"></i> YouTube
+    </a>
+    <a class="link-button discord" href="https://discord.gg/R2D36VqGKA" target="_blank">
+      <i class="fab fa-discord"></i> Discord Сервер
+    </a>
+    <a class="link-button discord" href="https://discordapp.com/users/nuriiscool" target="_blank">
+      <i class="fab fa-discord"></i> Discord Личный
+    </a>
+
+    <button class="copy-btn" onclick="copyTelegram()">
+      📋 Скопировать Telegram
+    </button>
+  </div>
+
+  <!-- JS: particles.js + скрипт копирования -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    function copyTelegram() {
+      const telegramUsername = "@darrliquer";
+      navigator.clipboard.writeText(telegramUsername)
+        .then(() => alert(`Telegram ${telegramUsername} скопирован!`))
+        .catch(err => alert("Ошибка копирования"));
+    }
+
+    // Запуск частиц
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 60 },
+        "size": { "value": 3 },
+        "color": { "value": "#ffffff" },
+        "opacity": { "value": 0.3 },
+        "move": { "speed": 1 },
+        "line_linked": {
+          "enable": true,
+          "distance": 120,
+          "color": "#ffffff",
+          "opacity": 0.2,
+          "width": 1
+        }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "repulse" }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+
+</body>
+</html>
