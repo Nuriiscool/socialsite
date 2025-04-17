@@ -282,7 +282,7 @@
     // ======================
     // ADMIN PANEL (TRIPLE-CLICK + HOTKEY)
     // ======================
-    const ADMIN_PASSWORD = "nuriiscool"; // CHANGE THIS!
+    const ADMIN_PASSWORD = "nuriiscool"; // Changed to your requested password
     let clickCount = 0;
 
     function showAdminPanel() {
@@ -302,7 +302,7 @@
     
     function checkAdminPassword() {
       const password = document.getElementById('admin-password').value;
-      if (password === nxriiscool) {
+      if (password === ADMIN_PASSWORD) {
         document.getElementById('admin-login').style.display = 'none';
         document.getElementById('admin-controls').style.display = 'block';
       } else {
@@ -317,7 +317,7 @@
       database.ref('status').set({
         state: status,
         message: text,
-        secretKey: nxriiscool, // Required by your Firebase rules
+        secretKey: SECRET_KEY, // Required by your Firebase rules
         timestamp: firebase.database.ServerValue.TIMESTAMP
       }).then(() => {
         alert("Status updated permanently!");
