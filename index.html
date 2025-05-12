@@ -189,22 +189,26 @@
     <h1>Hello! 👋</h1>
     <p>Connect with me:</p>
 
-    <a class="link-button instagram" href="https://instagram.com/nxr1_ba" target="_blank">
+    <a class="link-button instagram" href="https://instagram.com/nxr1_ba" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-instagram"></i> Instagram
     </a>
-    <a class="link-button tiktok" href="https://tiktok.com/@nxr1_ba" target="_blank">
+    <a class="link-button tiktok" href="https://tiktok.com/@nxr1_ba" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-tiktok"></i> TikTok
     </a>
-    <a class="link-button youtube" href="https://youtube.com/@Nuriiscool" target="_blank">
+    <a class="link-button youtube" href="https://youtube.com/@Nuriiscool" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-youtube"></i> YouTube
     </a>
-    <a class="link-button discord" href="https://discord.gg/R2D36VqGKA" target="_blank">
+    <a class="link-button discord" href="https://discord.gg/R2D36VqGKA" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-discord"></i> Discord Server
     </a>
-    <a class="link-button telegram" href="https://t.me/darrliquer" target="_blank">
+    <a class="link-button telegram" href="https://t.me/darrliquer" target="_blank" rel="noopener noreferrer">
       <i class="fab fa-telegram"></i> Telegram
     </a>
-    <a class="link-button twogis" href="https://2gis.ru/user/0b76b22dcf9741b381e78401e82270d0" target="_blank">
+    <!-- Telegram Group Button (добавлено выше 2GIS) -->
+    <a class="link-button telegram" href="https://t.me/+aO0cbWO_zHhhMDAy" target="_blank" rel="noopener noreferrer">
+      <i class="fab fa-telegram"></i> Telegram Group
+    </a>
+    <a class="link-button twogis" href="https://2gis.ru/user/0b76b22dcf9741b381e78401e82270d0" target="_blank" rel="noopener noreferrer">
       <i class="fas fa-map-marked-alt"></i> 2GIS
     </a>
 
@@ -228,7 +232,7 @@
           <option value="offline">Offline</option>
           <option value="online">Online</option>
         </select>
-        <input type="text" id="status-custom-text" placeholder="What I'm doing...">
+        <input type="text" id="status-custom-text" placeholder="What I'm doing..." maxlength="100">
         <button onclick="updateStatus()">Update Status</button>
         <button onclick="hideAdminPanel()" style="background: #e74c3c; margin-top: 10px;">Close Panel</button>
       </div>
@@ -251,83 +255,110 @@
       authDomain: "nuri-test-95cc5.firebaseapp.com",
       databaseURL: "https://nuri-test-95cc5-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "nuri-test-95cc5",
-      storageBucket: "nuri-test-95cc5.firebasestorage.app",
+      storageBucket: "nuri-test-95cc5.appspot.com",
       messagingSenderId: "440508513511",
       appId: "1:440508513511:web:f85ed92675fd040aad3642"
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-    const SECRET_KEY = "nxriiscool"; // Must match Firebase rules
-
-    // ======================
-    // STATUS SYSTEM
-    // ======================
-    function loadStatus() {
-      database.ref('status').on('value', (snapshot) => {
-        const data = snapshot.val() || {};
-        updateUI(data);
-      });
-    }
-
-    function updateUI(status) {
-      document.getElementById('status-dot').className = 'status-dot ' + (status.state || 'loading');
-      document.getElementById('status-text').textContent = 
-        status.state === 'online' ? 'Online' : 
-        status.state === 'offline' ? 'Offline' : 'Loading';
-      document.getElementById('status-message').textContent = status.message || 'Status not available';
+    let database;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      database = firebase.database();
+      console.log("Firebase initialized!");
+    } catch (error) {
+      console.error("Firebase error:", error);
     }
 
     // ======================
-    // ADMIN PANEL (TRIPLE-CLICK + HOTKEY)
+    // ADMIN PANEL PROTECTION
     // ======================
-    const ADMIN_PASSWORD = "nuriiscool"; // Changed to your requested password
-    let clickCount = 0;
+    const ADMIN_PASSWORD = "nxriiscool"; // Password for admin access
+    let failedAttempts = 0;
+    const MAX_ATTEMPTS = 3;
+    const BLOCK_TIME = 30000; // 30 seconds block
 
-    function showAdminPanel() {
+    function checkAdminPassword() {
+      const password = document.getElementById('admin-password').value;
+      
+      if (password === ADMIN_PASSWORD) {
+        failedAttempts = 0;
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-controls').style.display = 'block';
+        loadCurrentStatus();
+      } else {
+        failedAttempts++;
+        if (failedAttempts >= MAX_ATTEMPTS) {
+          alert(`Panel blocked for ${BLOCK_TIME/1000} seconds!`);
+          setTimeout(() => failedAttempts = 0, BLOCK_TIME);
+        } else {
+          alert(`Wrong password! Attempts left: ${MAX_ATTEMPTS - failedAttempts}`);
+        }
+      }
+    }
+
+    function loadCurrentStatus() {
+      if (!database) return;
+      
       database.ref('status').once('value').then((snapshot) => {
         const currentStatus = snapshot.val() || {};
         document.getElementById('status-select').value = currentStatus.state || 'online';
         document.getElementById('status-custom-text').value = currentStatus.message || '';
       });
+    }
+
+    function updateStatus() {
+      if (!database) {
+        alert("Database not connected!");
+        return;
+      }
+
+      const status = document.getElementById('status-select').value;
+      const text = document.getElementById('status-custom-text').value;
+      
+      if (text.length > 100) {
+        alert("Message too long (max 100 chars)");
+        return;
+      }
+
+      database.ref('status').set({
+        state: status,
+        message: text,
+        secretKey: "nxriiscool",
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        alert("Status updated!");
+      }).catch((error) => {
+        alert("Error: " + error.message);
+      });
+    }
+
+    // ======================
+    // PANEL CONTROLS
+    // ======================
+    function showAdminPanel() {
       document.getElementById('admin-overlay').style.display = 'flex';
       document.getElementById('admin-login').style.display = 'block';
       document.getElementById('admin-controls').style.display = 'none';
+      document.getElementById('admin-password').value = '';
     }
     
     function hideAdminPanel() {
       document.getElementById('admin-overlay').style.display = 'none';
     }
-    
-    function checkAdminPassword() {
-      const password = document.getElementById('admin-password').value;
-      if (password === ADMIN_PASSWORD) {
-        document.getElementById('admin-login').style.display = 'none';
-        document.getElementById('admin-controls').style.display = 'block';
-      } else {
-        alert("Incorrect password!");
-      }
-    }
 
-    function updateStatus() {
-      const status = document.getElementById('status-select').value;
-      const text = document.getElementById('status-custom-text').value;
-      
-      database.ref('status').set({
-        state: status,
-        message: text,
-        secretKey: SECRET_KEY, // Required by your Firebase rules
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      }).then(() => {
-        alert("Status updated permanently!");
-        hideAdminPanel();
-      }).catch((error) => {
-        alert("Error updating: " + error.message);
-      });
-    }
+    // ======================
+    // TRIGGERS
+    // ======================
+    // Hotkey: Ctrl+Alt+N
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
+        showAdminPanel();
+      }
+    });
 
     // Triple-click detection (bottom-right corner)
+    let clickCount = 0;
     document.addEventListener('click', (e) => {
       if (e.clientX > window.innerWidth - 150 && e.clientY > window.innerHeight - 150) {
         clickCount++;
@@ -336,13 +367,6 @@
           clickCount = 0;
         }
         setTimeout(() => { clickCount = 0; }, 1000);
-      }
-    });
-
-    // Hotkey: Ctrl+Alt+N
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'n') {
-        showAdminPanel();
       }
     });
 
@@ -358,6 +382,23 @@
             btn.innerHTML = '<i class="fas fa-copy"></i> Copy Telegram';
           }, 2000);
         });
+    }
+
+    function loadStatus() {
+      if (!database) return;
+      
+      database.ref('status').on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        updateUI(data);
+      });
+    }
+
+    function updateUI(status) {
+      document.getElementById('status-dot').className = 'status-dot ' + (status.state || 'loading');
+      document.getElementById('status-text').textContent = 
+        status.state === 'online' ? 'Online' : 
+        status.state === 'offline' ? 'Offline' : 'Loading';
+      document.getElementById('status-message').textContent = status.message || 'Status not available';
     }
 
     // ======================
